@@ -8,7 +8,8 @@
 
 namespace InferExamAnswers
 {
-std::vector<ExamResult> Parser::getExamResults(std::istream& inputStream)
+
+Parser::ExamResults Parser::getExamResults(std::istream& inputStream)
 {
 	static const auto maxStudent = 12;
 	static const auto maxQuestion = 40;
@@ -43,12 +44,15 @@ std::vector<ExamResult> Parser::getExamResults(std::istream& inputStream)
 
 	studentCount = static_cast<int8_t>(rawStudentCount);
 	questionCount = static_cast<int8_t>(rawQuestionCount);
-	;
 
 	const std::regex questionRegex(R"(\s*([0|1]{)" + match[2].str() + R"(})\s*(\d+))");
 
-	std::vector<ExamResult> examResults;
-	examResults.reserve(studentCount);
+	std::vector<std::vector<int8_t>> examAnswers;
+	std::vector<int8_t> examScores;
+
+	examAnswers.reserve(studentCount);
+	examScores.reserve(studentCount);
+
 	for (std::size_t i = 0; i < studentCount; ++i) {
 		int8_t score = 0;
 		std::vector<int8_t> answers;
@@ -71,10 +75,11 @@ std::vector<ExamResult> Parser::getExamResults(std::istream& inputStream)
 			answers.emplace_back(c == '0' ? 0 : 1);
 		}
 
-		examResults.emplace_back(ExamResult(std::move(answers), score));
+		examAnswers.emplace_back(std::move(answers));
+		examScores.emplace_back(score);
 	}
 
-	return examResults;
+	return std::make_pair(examAnswers, examScores);
 }
 
 } // InferExamAnswers

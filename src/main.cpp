@@ -1,3 +1,4 @@
+#include "Algorithm.hpp"
 #include "Parser.hpp"
 #include "version.hpp"
 
@@ -69,7 +70,23 @@ int main(int argc, char** argv)
 		return EXIT_SUCCESS;
 	}
 
-	auto examResult = InferExamAnswers::Parser::getExamResults(std::cin);
+	const auto [answers, scores] = InferExamAnswers::Parser::getExamResults(std::cin);
+
+	auto result = InferExamAnswers::Algorithm::runAlgorithm(answers, scores);
+
+	if (result.size() == 1)
+	{
+		for (const auto& i : result.front())
+		{
+			std::cout << +i;
+		}
+	}
+	else
+	{
+		std::cout << result.size() << " solutions";
+	}
+
+	std::cout << std::endl;
 
 	return EXIT_SUCCESS;
 }

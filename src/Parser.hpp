@@ -1,9 +1,9 @@
 #pragma once
 
-#include "ExamResult.hpp"
 #include "ParserError.hpp"
 
 #include <istream>
+#include <utility>
 #include <vector>
 
 /**
@@ -17,6 +17,8 @@ namespace InferExamAnswers
 class Parser
 {
 public:
+	using ExamResults = std::pair<std::vector<std::vector<int8_t>>, std::vector<int8_t>>;
+
 	/**
 	 * @brief Delete constructor
 	 */
@@ -60,8 +62,9 @@ public:
 	 * @throw invalid_argument If input form is correct but is not valid
 	 *
 	 * @param inputStream The inputStream to read from
-	 * @return A vector containing all exam results
+	 * @return A pair containing in the first index a vector of the answers for each student and on the second
+	 *         index containing the score
 	 */
-	[[nodiscard]] static std::vector<ExamResult> getExamResults(std::istream& inputStream);
+	[[nodiscard]] static ExamResults getExamResults(std::istream& inputStream);
 };
 } // InferExamAnswers

@@ -3,7 +3,6 @@
 
 #include <cstddef>
 #include <iterator>
-#include <limits>
 #include <sstream>
 
 SCENARIO("Parsing box specifcations from inputStream")
@@ -26,14 +25,14 @@ SCENARIO("Parsing box specifcations from inputStream")
 				stream << " " << +(inputScores[i]) << std::endl;
 			}
 
-			const auto examResults = InferExamAnswers::Parser::getExamResults(stream);
+			const auto [answers, scores] = InferExamAnswers::Parser::getExamResults(stream);
 
 			THEN("The exam results are parsed correctly")
 			{
-				REQUIRE(examResults.size() == inputAnswers.size());
-				for (std::size_t i = 0; i < examResults.size(); ++i) {
-					REQUIRE(examResults[i].getScore() == inputScores[i]);
-					REQUIRE(examResults[i].getExamAnswers() == inputAnswers[i]);
+				REQUIRE(answers.size() == inputAnswers.size());
+				for (std::size_t i = 0; i < answers.size(); ++i) {
+					REQUIRE(scores[i] == inputScores[i]);
+					REQUIRE(answers[i] == inputAnswers[i]);
 				}
 			}
 		}
