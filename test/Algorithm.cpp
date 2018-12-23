@@ -6,94 +6,77 @@
 
 SCENARIO("Bitsequence generation")
 {
-	GIVEN("a length and a bit sequence generator")
-	{
-		WHEN("Generating bit sequence of that length")
-		{
-			THEN("The next bit sequence is always one larger")
-			{
-				std::vector<int8_t> sequence(3);
-				REQUIRE(std::vector<int8_t> {0,0,0} == sequence);
-				
-				REQUIRE(InferExamAnswers::Algorithm::generateNextBitSequence(sequence) == true);
-				REQUIRE(std::vector<int8_t> {1,0,0} == sequence);
+	// GIVEN("an algorithm that can infer exam solution given a list of exam answers and scores")
+	// {
+	// 	WHEN("there is an exam with a single question and a single student")
+	// 	{
+	// 		std::vector<std::vector<int8_t>> inputAnswers{{1}};
+	// 		std::vector<int8_t> inputScores{1};
 
-				REQUIRE(InferExamAnswers::Algorithm::generateNextBitSequence(sequence) == true);
-				REQUIRE(std::vector<int8_t> {0,1,0} == sequence);
+	// 		auto result = InferExamAnswers::Algorithm::runAlgorithm(inputAnswers, inputScores);
+		
+	// 		THEN("the algorithm finds a single solutions")
+	// 		{
+	// 			REQUIRE(result.size() == 1);
+	// 			REQUIRE(result.front() == std::vector<int8_t>{ 1 });
+	// 		}
+	// 	}
 
-				REQUIRE(InferExamAnswers::Algorithm::generateNextBitSequence(sequence) == true);
-				REQUIRE(std::vector<int8_t> {1,1,0} == sequence);
+	// 	WHEN("there is an exam with no solutions")
+	// 	{
+	// 		std::vector<std::vector<int8_t>> inputAnswers{
+	// 			{0,1,1,0,1},
+	// 			{1,0,1,0,0},
+	// 			{0,0,0,1,1}
+	// 		};
 
-				REQUIRE(InferExamAnswers::Algorithm::generateNextBitSequence(sequence) == true);
-				REQUIRE(std::vector<int8_t> {0,0,1} == sequence);
+	// 		std::vector<int8_t> inputScores{0, 3, 2};
 
-				REQUIRE(InferExamAnswers::Algorithm::generateNextBitSequence(sequence) == true);
-				REQUIRE(std::vector<int8_t> {1,0,1} == sequence);
+	// 		auto result = InferExamAnswers::Algorithm::runAlgorithm(inputAnswers, inputScores);
+			
+	// 		THEN("the algorithm finds no solutions")
+	// 		{
+	// 			REQUIRE(result.empty());
+	// 		}
+	// 	}
 
-				REQUIRE(InferExamAnswers::Algorithm::generateNextBitSequence(sequence) == true);
-				REQUIRE(std::vector<int8_t> {0,1,1} == sequence);
+	// 	WHEN("there is an exam with a single solutions")
+	// 	{
+	// 		std::vector<std::vector<int8_t>> inputAnswers{
+	// 			{0,1,1,0,1},
+	// 			{1,0,1,0,0},
+	// 			{0,0,0,1,1}
+	// 		};
 
-				REQUIRE(InferExamAnswers::Algorithm::generateNextBitSequence(sequence) == true);
-				REQUIRE(std::vector<int8_t> {1,1,1} == sequence);
+	// 		std::vector<int8_t> inputScores{4, 3, 3};
 
-				REQUIRE(InferExamAnswers::Algorithm::generateNextBitSequence(sequence) == false);
-			}
-		}
-	}
+	// 		auto result = InferExamAnswers::Algorithm::runAlgorithm(inputAnswers, inputScores);
+			
+	// 		THEN("the algorithm finds one solutions")
+	// 		{
+	// 			REQUIRE(result.size() == 1);
+	// 			REQUIRE(result.front() == std::vector<int8_t>{ 0,0,1,0,1 });
+	// 		}
+	// 	}
 
-	GIVEN("A list of exam answer")
-	{
-		std::vector<std::vector<int8_t>> inputAnswers{{1}};
-		std::vector<int8_t> inputScores{1};
+	// 	WHEN("there is an exam with 4 solutions")
+	// 	{
+	// 		std::vector<std::vector<int8_t>> inputAnswers{
+	// 			{0,0,0,0},
+	// 			{1,0,1,0},
+	// 			{0,1,0,1},
+	// 			{1,1,1,1}
+	// 		};
 
-		WHEN("Splitting the exam answer into two")
-		{
-			auto questionsCount = inputAnswers[0].size();
-			auto splitIndex = questionsCount / 2;
+	// 		std::vector<int8_t> inputScores{2, 2, 2, 2};
 
-			auto leftScores = InferExamAnswers::Algorithm::computeScoreMap(inputAnswers, inputScores, 0, splitIndex);
-			auto rightScores = InferExamAnswers::Algorithm::computeScoreMap(inputAnswers, inputScores, splitIndex, questionsCount);
+	// 		auto result = InferExamAnswers::Algorithm::runAlgorithm(inputAnswers, inputScores);
+			
+	// 		THEN("the algorithm finds four solutions")
+	// 		{
+	// 			REQUIRE(result.size() == 4);
+	// 		}
+	// 	}
 
-			std::cout << "leftScores: " << std::endl;
-			for ( const auto &[k, v]: leftScores) {
-				std::cout << '\t';
-				for (const auto& j : k)
-				{
-					std::cout << +j;
-				}
-				std::cout << ": ";
-				for (const auto& j : v)
-				{
-					for (const auto& s : j)
-					{
-						std::cout << +s;
-					}
-					std::cout << ",";
-				}
-				std::cout << std::endl;
-			}
-
-			std::cout << "rightScores: " << std::endl;
-			for ( const auto &[k, v]: rightScores) {
-				std::cout << '\t';
-				for (const auto& j : k)
-				{
-					std::cout << +j;
-				}
-				std::cout << ": ";
-				for (const auto& j : v)
-				{
-					for (const auto& s : j)
-					{
-						std::cout << +s;
-					}
-					std::cout << ",";
-				}
-				std::cout << std::endl;
-			}
-
-			std::cout << std::endl << std::endl << std::endl << std::endl;
-		}
-
-	}
+	// }
 }

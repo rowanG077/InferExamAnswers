@@ -1,24 +1,24 @@
 #pragma once
 
+#include "ExamResults.hpp"
 #include "ParserError.hpp"
 
 #include <istream>
 #include <utility>
-#include <vector>
+#include <valarray>
 
 /**
  * @brief Contains code for the InferExamAnswers problem
  */
 namespace InferExamAnswers
 {
+
 /**
  * @brief Parser class that handles reading from input to obtain ExamAnswers
  */
 class Parser
 {
 public:
-	using ExamResults = std::pair<std::vector<std::vector<int8_t>>, std::vector<int8_t>>;
-
 	/**
 	 * @brief Delete constructor
 	 */

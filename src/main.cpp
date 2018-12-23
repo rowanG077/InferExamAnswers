@@ -70,20 +70,21 @@ int main(int argc, char** argv)
 		return EXIT_SUCCESS;
 	}
 
-	const auto [answers, scores] = InferExamAnswers::Parser::getExamResults(std::cin);
+	const auto examResults = InferExamAnswers::Parser::getExamResults(std::cin);
 
-	auto result = InferExamAnswers::Algorithm::runAlgorithm(answers, scores);
+	auto solutions = InferExamAnswers::Algorithm::runAlgorithm(examResults);
 
-	if (result.size() == 1)
+	if (solutions.size() == 1)
 	{
-		for (const auto& i : result.front())
+		auto& s = solutions.front();
+		for (size_t i = 0; i < examResults.questionCount; ++i)
 		{
-			std::cout << +i;
+			std::cout << ((s >> (examResults.questionCount - i)) & 1U);
 		}
 	}
 	else
 	{
-		std::cout << result.size() << " solutions";
+		std::cout << solutions.size() << " solutions";
 	}
 
 	std::cout << std::endl;

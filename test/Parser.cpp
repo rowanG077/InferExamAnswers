@@ -5,34 +5,42 @@
 #include <iterator>
 #include <sstream>
 
+
 SCENARIO("Parsing box specifcations from inputStream")
 {
 	GIVEN("an input stream")
 	{
 		WHEN("parsing correct input")
 		{
-			std::vector<std::vector<int8_t>> inputAnswers{{0, 1, 1, 0, 1}, {1, 0, 1, 0, 0}, {0, 0, 0, 1, 1}};
-			std::vector<int8_t> inputScores{4, 3, 3};
+			uint8_t questionCount = 5;
+			std::valarray<uint64_t> inputAnswers{
+				0b01101,
+				0b10100,
+				0b00011
+			};
+			std::valarray<uint8_t> inputScores{4, 3, 3};
 
 			std::stringstream stream;
 
-			stream << inputAnswers.size() << " " << inputAnswers[0].size() << std::endl;
+			stream << inputAnswers.size() << " " << +questionCount << std::endl;
 
-			for (std::size_t i = 0; i < inputAnswers.size(); ++i) {
-				for (const auto& a : inputAnswers[i]) {
-					stream << +a;
+			for (size_t i = 0; i < inputAnswers.size(); ++i) {
+				for (size_t j = 0; j < questionCount; ++j)
+				{
+					stream << ((inputAnswers[i] >> (questionCount - j - 1)) & 1U);
 				}
 				stream << " " << +(inputScores[i]) << std::endl;
 			}
 
-			const auto [answers, scores] = InferExamAnswers::Parser::getExamResults(stream);
+			const auto examResults = InferExamAnswers::Parser::getExamResults(stream);
 
 			THEN("The exam results are parsed correctly")
 			{
-				REQUIRE(answers.size() == inputAnswers.size());
-				for (std::size_t i = 0; i < answers.size(); ++i) {
-					REQUIRE(scores[i] == inputScores[i]);
-					REQUIRE(answers[i] == inputAnswers[i]);
+				REQUIRE(examResults.answers.size() == inputAnswers.size());
+
+				for (std::size_t i = 0; i < examResults.answers.size(); ++i) {
+					REQUIRE(examResults.scores[i] == inputScores[i]);
+					REQUIRE(examResults.answers[i] == inputAnswers[i]);
 				}
 			}
 		}

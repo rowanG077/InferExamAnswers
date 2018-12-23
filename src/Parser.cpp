@@ -1,15 +1,17 @@
 #include "Parser.hpp"
 
 #include <cstdint>
+#include <iostream>
 #include <limits>
 #include <regex>
 #include <sstream>
 #include <string>
 
+
 namespace InferExamAnswers
 {
 
-Parser::ExamResults Parser::getExamResults(std::istream& inputStream)
+ExamResults Parser::getExamResults(std::istream& inputStream)
 {
 	static const auto maxStudent = 12;
 	static const auto maxQuestion = 40;
@@ -17,8 +19,8 @@ Parser::ExamResults Parser::getExamResults(std::istream& inputStream)
 
 	std::smatch match;
 
-	int8_t studentCount = 0;
-	int8_t questionCount = 0;
+	uint8_t studentCount = 0;
+	uint8_t questionCount = 0;
 
 	std::string inputLine;
 	std::getline(inputStream, inputLine);
@@ -42,22 +44,18 @@ Parser::ExamResults Parser::getExamResults(std::istream& inputStream)
 		throw std::invalid_argument("A maximum of 40 questions are supported.");
 	}
 
-	studentCount = static_cast<int8_t>(rawStudentCount);
-	questionCount = static_cast<int8_t>(rawQuestionCount);
+	studentCount = static_cast<uint8_t>(rawStudentCount);
+	questionCount = static_cast<uint8_t>(rawQuestionCount);
 
 	const std::regex questionRegex(R"(\s*([0|1]{)" + match[2].str() + R"(})\s*(\d+))");
 
-	std::vector<std::vector<int8_t>> examAnswers;
-	std::vector<int8_t> examScores;
+	std::valarray<uint64_t> examAnswers;
+	std::valarray<uint8_t> examScores;
 
-	examAnswers.reserve(studentCount);
-	examScores.reserve(studentCount);
+	examAnswers.resize(studentCount);
+	examScores.resize(studentCount);
 
 	for (std::size_t i = 0; i < studentCount; ++i) {
-		int8_t score = 0;
-		std::vector<int8_t> answers;
-		answers.reserve(questionCount);
-
 		std::getline(inputStream, inputLine);
 		if (!std::regex_match(inputLine, match, questionRegex)) {
 			std::stringstream ss;
@@ -70,16 +68,18 @@ Parser::ExamResults Parser::getExamResults(std::istream& inputStream)
 			throw std::invalid_argument("Score is higher then the number of questions.");
 		}
 
-		score = static_cast<int8_t>(rawScore);
-		for (const auto& c : match[1].str()) {
-			answers.emplace_back(c == '0' ? 0 : 1);
-		}
+		const auto bitString = match[1].str();
 
-		examAnswers.emplace_back(std::move(answers));
-		examScores.emplace_back(score);
+		examScores[i] = static_cast<uint8_t>(rawScore);
+		for (uint8_t j = 0; j < questionCount; ++j) {
+			if (bitString[j] == '1')
+			{
+				examAnswers[i] |= (1UL << static_cast<uint8_t>(questionCount - j - 1));
+			}
+		}
 	}
 
-	return std::make_pair(examAnswers, examScores);
+	return ExamResults { examAnswers, examScores, questionCount, studentCount };
 }
 
 } // InferExamAnswers

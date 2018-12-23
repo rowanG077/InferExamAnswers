@@ -1,5 +1,7 @@
 #pragma once
 
+#include "ExamResults.hpp"
+
 #include <cstdint>
 #include <list>
 #include <unordered_map>
@@ -11,14 +13,31 @@
 namespace InferExamAnswers
 {
 
-struct VectorHash {
-	size_t operator()(const std::vector<int8_t>& v) const {
-		std::hash<int> hasher;
+struct ValarrayHash {
+	size_t operator()(const std::valarray<uint8_t>& v) const {
+		std::hash<uint8_t> hasher;
 		size_t seed = 0;
-		for (int i : v) {
+		for (auto i : v) {
 			seed ^= hasher(i) + 0x9e3779b9 + (seed << 6u) + (seed >> 2u);
 		}
 		return seed;
+	}
+};
+
+struct ValarrayEqual {
+	bool operator()(const std::valarray<uint8_t>& a, const std::valarray<uint8_t>& b) const {
+		bool equals = true;
+
+		for (size_t i = 0; i < a.size(); ++i)
+		{
+			equals &= a[i] == b[i];
+			if (!equals)
+			{
+				break;
+			}
+		}
+
+		return equals;
 	}
 };
 
@@ -29,9 +48,9 @@ class Algorithm
 {
 public:
 	/**
-	 * @brief Map that contains the score of each student as a key and the value is the associated solution
+	 * @brief Map that contains the score of each student as a key and the value are the associated solutions
 	 */
-	using ScoreMap = std::unordered_map<std::vector<int8_t>, std::list<std::vector<int8_t>>, VectorHash>;
+	using ScoreMap = std::unordered_map<std::valarray<uint8_t>, std::list<uint32_t>, ValarrayHash, ValarrayEqual>;
 
 	/**
 	 * @brief Deleted constructor
@@ -72,48 +91,20 @@ public:
 	/**
 	 * @brief Run the algorithm to find all possible exam answers
 	 * 
-	 * @param answers The answers given by each student
-	 * @param scores The scores associated with each answer
-	 * @return  
+	 * @param examResults The results of the exam
+	 * @return The possible results
 	 */
-	[[nodiscard]] static std::list<std::vector<int8_t>> runAlgorithm(
-		const std::vector<std::vector<int8_t>>& answers,
-		const std::vector<int8_t>& scores);
+	[[nodiscard]] static std::list<uint64_t> runAlgorithm(const ExamResults& examResults);
 
 	/**
-	 * @brief Generate the next bit sequence given the current sequence
+	 * @brief Compute a scoreMap for a part of the exam. The part that is computed is indicated by indices n and m
 	 * 
-	 * @param currentSequence the current sequence to get the successor for
-	 * @return Return false if the the end of the sequence has been reached
+	 * @param examResults The results of the exam
+	 * @param n The start index of the examResults partition
+	 * @param m The end index of the examResults partition
+	 * @return The resulting scoreMap
 	 */
-	[[nodiscard]] static bool generateNextBitSequence(std::vector<int8_t>& currentSequence);
-
-	/**
-	 * @brief Compute a scoreMap for a split part of the exams
-	 * 
-	 * @param exams The exams
-	 * @param n The lower limit which answers to use to compute the map
-	 * @param m The upper limit which answers to use to compute the map
-	 * @return The resulting map containing a vector of scores as keys with the associated solution
-	 */
-	[[nodiscard]] static ScoreMap computeScoreMap(
-		const std::vector<std::vector<int8_t>>& answers,
-		const std::vector<int8_t>& scores,
-		int8_t n, int8_t m);
-
-	/**
-	 * @brief Calculate the score for an answer given by a student a with a subset of an exam solution
-	 * 
-	 * @param studentAnswer The vector of answer a student has given
-	 * @param examSolution The proposed solution to check the score for
-	 * @param n The start index of the exam solution that should be checked with the studentAnswer
-	 * @param m The end index of the exam solution that should be checked with the studentAnswer
-	 * @return The score the student has obtained for the subset
-	 */
-	[[nodiscard]] static int8_t calculateScore(
-		const std::vector<int8_t>& studentAnswer,
-		const std::vector<int8_t>& examSolution,
-		int8_t n, int8_t m);
+	[[nodiscard]] static ScoreMap computeScoreMap(const ExamResults& examResults, uint8_t n, uint8_t m);
 
 };
 } // InferExamAnswers
