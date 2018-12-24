@@ -12,9 +12,8 @@
  */
 namespace InferExamAnswers
 {
-
 /**
- * @brief Parser class that handles reading from input to obtain ExamAnswers
+ * @brief Parser class that handles reading from input to obtain ExamResults
  */
 class Parser
 {

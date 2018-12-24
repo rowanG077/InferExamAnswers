@@ -1,101 +1,48 @@
 #include "Algorithm.hpp"
 
-#include <iostream>
-
-#include <sstream>
-
 namespace InferExamAnswers
 {
-
-std::string binaryToString(uint64_t s) // NOLINT
-{
-	std::stringstream ss;
-	for (size_t i = 0; i < 64; ++i)
-	{
-		ss << ((s >> (63 - i)) & 1U);
-	}
-
-	return ss.str();
-}
-
-std::string scoreToString(const std::valarray<uint8_t>& score)
-{
-	std::stringstream ss;
-	ss << "[";
-	for (size_t i = 0; i < score.size(); ++i)
-	{
-		ss << +score[i];
-		if (i + 1 != score.size())
-		{
-			ss << ", ";
-		}
-	}
-
-	ss << "]";
-	return ss.str();
-}
-
 SolutionCollection Algorithm::runAlgorithm(const ExamResults& examResults)
 {
+	/**
+	 * We split the answers of all students into two parts. We brute force
+	 * The possible exam solution for each side and then combine the results
+	 */
 	uint8_t splitIndex = examResults.questionCount / 2;
 
-	// std::cout << "computing right scores" << std::endl << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
-	
+	/**
+	 * The results of the brute force computation of each side is stored
+	 * in a map. The key is a valarray of the score of each student and the
+	 * value are the associated solution(s). This way we can easily compute
+	 * what the corresponding key is to a score in a map because we can
+	 * subtract the key from the obtained scores to obtain the required key
+	 * for the other half.
+	 */
 	const auto rightScores = computeScoreMap(examResults, 0, splitIndex);
-	
-	// std::cout << std::endl << "computing left scores" << std::endl << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
-	
 	const auto leftScores = computeScoreMap(examResults, splitIndex, examResults.questionCount);
-
-	// std::cout << "left solutions size: " << leftScores.size() << ", right solutions size: " << rightScores.size() << std::endl;
 
 	SolutionCollection solutions;
 
-	// std::cout << "Total required score: " << scoreToString(examResults.scores) << std::endl;
-
-	// std::cout << "scores in right: " << std::endl;
-	// for (const auto& [rightScore, rightSolutions] : rightScores)
-	// {
-	// 	std::cout << "\t" << scoreToString(rightScore) << ", with number of solutions: " << rightSolutions.getSize() << std::endl;
-	// }
-
-	// std::cout << "scores in left: " << std::endl;
-	// for (const auto& [leftScore, leftSolutions] : leftScores)
-	// {
-	// 	std::cout << "\t" << scoreToString(leftScore) << ", with number of solutions: " << leftSolutions.getSize() << std::endl;
-	// }
-
-	// Fuse results
-	for (const auto& [rightScore, rightSolutions] : rightScores)
-	{
-		// std::cout << "trying to combine right score " << scoreToString(rightScore) << ", with number of solutions: " << rightSolutions.getSize() << std::endl;
-
-		// std::cout << "with left score so looking for leftScore: " << scoreToString(examResults.scores - rightScore);
-
+	// Combine the left and right scores
+	for (const auto& [rightScore, rightSolutions] : rightScores) {
 		const std::valarray<uint8_t> leftScore = examResults.scores - rightScore;
 
-		auto it = leftScores.find(leftScore);
-		if (it == leftScores.end())
-		{
-			// std::cout << ", Did not find leftScore continueing..." << std::endl;
+		const auto it = leftScores.find(leftScore);
+		if (it == leftScores.end()) {
 			continue;
 		}
 
-		auto& leftSolutions = it->second;
+		const auto& leftSolutions = it->second;
 
-		// std::cout << ", with number of solutions: " << leftSolutions.getSize() << std::endl;
-
-		// we only actually add the solutions here if the cardinality of the cartesian
-		// product is 1 since if it is larger we aren't interested in the actual solution
-		// just the number of them so we can just add dummy solutions
+		/**
+		 * we only actually add the solutions here if the cardinality of the cartesian
+		 * product is 1 since if it is larger we aren't interested in the actual solution
+		 * just the number of them so we can just add dummy solutions
+		 */
 		auto combinationCount = leftSolutions.getSize() * rightSolutions.getSize();
-		if (solutions.getSize() == 0 && combinationCount == 1)
-		{
-			uint64_t solution = (leftSolutions.getSolution() << splitIndex) | rightSolutions.getSolution();
-			solutions.addSolution(solution);
-		}
-		else
-		{
+		if (solutions.getSize() == 0 && combinationCount == 1) {
+			solutions.addSolution((leftSolutions.getSolution() << splitIndex) | rightSolutions.getSolution());
+		} else {
 			solutions.grow(combinationCount);
 		}
 	}
@@ -107,23 +54,38 @@ Algorithm::ScoreMap Algorithm::computeScoreMap(const ExamResults& examResults, u
 {
 	/**
 	 *  Compute the length of the answers to create for the current partition
-	 *  and for the other partition
+	 *  and the also compute the length of the anwers for the other partition.
 	 */
 	uint8_t currentSequenceLength = m - n;
 	uint8_t otherSequenceLength = examResults.questionCount - currentSequenceLength;
 
-	auto solutionsToCheck = 1UL << currentSequenceLength;
-	auto scoreMask = solutionsToCheck - 1;
+	/**
+	 * We have to check 2^currentSequenceLength solutions.
+	 * So we create that number so we can use it as the upper
+	 * limit in a for loop.
+	 */
+	uint64_t solutionsToCheck = 1UL << currentSequenceLength;
+
+	/**
+	 * Since we are checking a subset of the total answers
+	 * of a student we might have some extra bits from other
+	 * answers we need to disregard. This mask uses can be used
+	 * to filter out only the bits of the current subset since
+	 * it contains currentSequenceLength number of 1 bits
+	 */
+	uint64_t scoreMask = solutionsToCheck - 1UL;
+
+	/**
+	 * Initial bucket count will be the amount of possible solutions so a rehash
+	 * will never occur while trying solutions.
+	 */
 	ScoreMap scoreMap(solutionsToCheck);
 
 	/**
-	 * If the length is 0 it would mean no answers are created to check
-	 * however if the length is 0 then everyone has a score of 0 with a
-	 * solution that has no answers
+	 * If the length of the current partition is 0 no solution would be checked.
+	 * However there still is a correct in that case. One with 0 solutions
 	 */
-	if (currentSequenceLength == 0)
-	{
-		// std::cout << "Empty sequnce putting en lambda solution" << std::endl;
+	if (currentSequenceLength == 0) {
 		std::valarray<uint8_t> score(examResults.studentCount);
 
 		auto collection = SolutionCollection();
@@ -133,34 +95,46 @@ Algorithm::ScoreMap Algorithm::computeScoreMap(const ExamResults& examResults, u
 	}
 
 	/**
-	 * We create every possible answer sheet from 0 to 2^n  
+	 * We create every possible solution from 0 to 2^n
+	 * Verify if the resulting score with that solution
+	 * still makes it possible to obtain the actual score
+	 * the student got.
 	 */
-	for (uint32_t i = 0; i < solutionsToCheck; ++i)
-	{
-		auto keepSequence = true;
+	for (uint32_t i = 0; i < solutionsToCheck; ++i) {
+		auto keepSolution = true;
 		std::valarray<uint8_t> score(examResults.studentCount);
 
-		for (uint8_t j = 0; j < examResults.studentCount; ++j)
-		{
-			auto matchingAnswers = ~((examResults.answers[j] >> n) ^ i) & scoreMask;
-			score[j] = __builtin_popcount(matchingAnswers);
+		for (uint8_t j = 0; j < examResults.studentCount; ++j) {
+			/**
+			 * To obtain the score a student has obtained given a solution and the answer
+			 * We first have to bitshift the solution over the current answers we are going
+			 * to check. Then we apply a XOR operation. This results in a bit string that
+			 * will contain a 1 if the answer didn't match and a 0 if it did match. So we
+			 * negate that result. However since this result can still contain answers
+			 * from the partition that we are currently disregarding we have to mask them
+			 * out using the scoreMask.
+			 *
+			 * Now finally we need to count the amount of set bits in the resulting bit string.
+			 * For this we use the special builtin function popcount which actually results
+			 * in a single assembly instruction on modern hardware.
+			 */
+			uint64_t correctAnswers = ~((examResults.answers[j] >> n) ^ i) & scoreMask;
+			score[j] = __builtin_popcount(correctAnswers);
 
-			// std::cout << "======================================" << std::endl << "\t" << binaryToString(examResults.answers[j]);
-			// std::cout << std::endl << "\t" << binaryToString(examResults.answers[j] >> n);
-			// std::cout << std::endl << " ^\t" << binaryToString(i);
-			// std::cout << std::endl << "-----------------------------" << std::endl << "\t" << binaryToString((examResults.answers[j] >> n) ^ i);
-			// std::cout << std::endl << "score: " << +score[j] << std::endl;
-			
-			
-			if (score[j] < examResults.scores[j] - otherSequenceLength || score[j] > examResults.scores[j])
-			{
-				keepSequence = false;
+			/**
+			 * The solution will be thrown away if the current
+			 * score plus the perfect score for the other partition
+			 * is smaller then the required score because there is no way
+			 * to obtain the required score then.
+			 * The same applies if the score exceeds the required score.
+			 */
+			if (score[j] + otherSequenceLength < examResults.scores[j] || score[j] > examResults.scores[j]) {
+				keepSolution = false;
 				break;
 			}
 		}
 
-		if (!keepSequence)
-		{
+		if (!keepSolution) {
 			continue;
 		}
 
@@ -168,13 +142,17 @@ Algorithm::ScoreMap Algorithm::computeScoreMap(const ExamResults& examResults, u
 		collection.addSolution(i);
 
 		// Clang-tidy sees this as a dead store but it's a false positive
-		auto [it, inserted] = scoreMap.insert({ std::move(score), std::move(collection) }); // NOLINT
-		if (!inserted)
-		{
+		auto [it, inserted] = scoreMap.insert({std::move(score), std::move(collection)}); // NOLINT
+		if (!inserted) {
 			it->second.grow(1);
 		}
 	}
 
+	/**
+	 * Rehashing will remove unused buckets. Since after this the map will not
+	 * be mutated further this will improve iteration speed when combining the
+	 * partitions
+	 */
 	scoreMap.rehash(scoreMap.size());
 
 	return scoreMap;

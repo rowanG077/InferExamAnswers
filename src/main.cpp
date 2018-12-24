@@ -38,7 +38,7 @@ void printHelp(const std::string& progName)
 		<< "where p is positive integer representing the number of students "
 		<< "and q is a positive integer representing the number of exam questions "
 		<< "For each question all students answered either 1 or 0 represented by the a_1a_2...a_q" << std::endl
-		<< "Example:" << std::endl
+		<< std::endl << "Example:" << std::endl
 		<< "3 5" << std::endl
 		<< "01101 4" << std::endl
 		<< "10100 3" << std::endl
@@ -46,7 +46,8 @@ void printHelp(const std::string& progName)
 		<< std::endl
 		<< "once input is given the program will calculate all possibilies of exams that could lead to the scores. "
 		<< "If there is only one way for the exam answers to match the given input the sequence of answers is given, "
-		<< "else only the number of possible sequences is given." << std::endl;
+		<< "else only the number of possible sequences is given." << std::endl
+		<< std::endl;
 
 	printVersion();
 }
@@ -54,7 +55,7 @@ void printHelp(const std::string& progName)
 int main(int argc, char** argv)
 {
 	// Because ptr arithmatic is not allowed but we need it here
-	// to access program arguments we exclude no lint here
+	// to access program arguments we explicitly NOLINT here.
 	std::vector<std::string> arguments(argv, argv + argc); // NOLINT
 
 	if (arguments.size() >= 2) {
@@ -74,16 +75,12 @@ int main(int argc, char** argv)
 
 	auto solutions = InferExamAnswers::Algorithm::runAlgorithm(examResults);
 
-	if (solutions.getSize() == 1)
-	{
+	if (solutions.getSize() == 1) {
 		auto s = solutions.getSolution();
-		for (size_t i = 0; i < examResults.questionCount; ++i)
-		{
+		for (size_t i = 0; i < examResults.questionCount; ++i) {
 			std::cout << ((s >> (examResults.questionCount - i - 1)) & 1U);
 		}
-	}
-	else
-	{
+	} else {
 		std::cout << solutions.getSize() << " solutions";
 	}
 

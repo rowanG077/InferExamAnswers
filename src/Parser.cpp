@@ -7,10 +7,8 @@
 #include <sstream>
 #include <string>
 
-
 namespace InferExamAnswers
 {
-
 ExamResults Parser::getExamResults(std::istream& inputStream)
 {
 	static const auto maxStudent = 12;
@@ -49,11 +47,8 @@ ExamResults Parser::getExamResults(std::istream& inputStream)
 
 	const std::regex questionRegex(R"(\s*([0|1]{)" + match[2].str() + R"(})\s*(\d+))");
 
-	std::valarray<uint64_t> examAnswers;
-	std::valarray<uint8_t> examScores;
-
-	examAnswers.resize(studentCount);
-	examScores.resize(studentCount);
+	std::valarray<uint64_t> studentAnswers(studentCount);
+	std::valarray<uint8_t> examScores(studentCount);
 
 	for (std::size_t i = 0; i < studentCount; ++i) {
 		std::getline(inputStream, inputLine);
@@ -72,14 +67,13 @@ ExamResults Parser::getExamResults(std::istream& inputStream)
 
 		examScores[i] = static_cast<uint8_t>(rawScore);
 		for (uint8_t j = 0; j < questionCount; ++j) {
-			if (bitString[j] == '1')
-			{
-				examAnswers[i] |= (1UL << static_cast<uint8_t>(questionCount - j - 1));
+			if (bitString[j] == '1') {
+				studentAnswers[i] |= 1U << (questionCount - j - 1U);
 			}
 		}
 	}
 
-	return ExamResults { examAnswers, examScores, questionCount, studentCount };
+	return ExamResults{studentAnswers, examScores, questionCount, studentCount};
 }
 
 } // InferExamAnswers

@@ -5,7 +5,6 @@
 #include <iterator>
 #include <sstream>
 
-
 SCENARIO("Parsing box specifcations from inputStream")
 {
 	GIVEN("an input stream")
@@ -13,11 +12,7 @@ SCENARIO("Parsing box specifcations from inputStream")
 		WHEN("parsing correct input")
 		{
 			uint8_t questionCount = 5;
-			std::valarray<uint64_t> inputAnswers{
-				0b01101,
-				0b10100,
-				0b00011
-			};
+			std::valarray<uint64_t> inputAnswers{0b01101, 0b10100, 0b00011};
 			std::valarray<uint8_t> inputScores{4, 3, 3};
 
 			std::stringstream stream;
@@ -25,8 +20,7 @@ SCENARIO("Parsing box specifcations from inputStream")
 			stream << inputAnswers.size() << " " << +questionCount << std::endl;
 
 			for (size_t i = 0; i < inputAnswers.size(); ++i) {
-				for (size_t j = 0; j < questionCount; ++j)
-				{
+				for (size_t j = 0; j < questionCount; ++j) {
 					stream << ((inputAnswers[i] >> (questionCount - j - 1)) & 1U);
 				}
 				stream << " " << +(inputScores[i]) << std::endl;

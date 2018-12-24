@@ -1,8 +1,6 @@
 #pragma once
 
-
 #include <cstdint>
-#include <iostream>
 #include <valarray>
 
 /**
@@ -10,16 +8,15 @@
  */
 namespace InferExamAnswers
 {
-
 /**
  * @brief Contains the results of the exam
  */
 struct ExamResults
 {
 	/**
-	* @brief Contains the answers of each student represented as a single number
-	*        Note that only the bits update questionCount are used.
-	*/
+	 * @brief Contains the answers of each student represented as a single number
+	 *        Note that only the bits upto questionCount are used.
+	 */
 	std::valarray<uint64_t> answers;
 
 	/**
@@ -28,7 +25,7 @@ struct ExamResults
 	std::valarray<uint8_t> scores;
 
 	/**
-	 * @brief The number of questions for the exam  
+	 * @brief The number of questions for the exam
 	 */
 	std::uint8_t questionCount;
 

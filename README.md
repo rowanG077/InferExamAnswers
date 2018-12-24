@@ -1,15 +1,17 @@
 # InferExamAnswers
 
-Given an exam with only True False questions and a list of answers from multiple students with theirs scores infer the correct answers for the exam.
+Given an exam with only True False questions and a list of answers from multiple 
+students with their scores infer the correct answers for the exam.
 
 # Usage
 ```
-usage: InferExamAnswers [options]
+usage: src/InferExamAnswers [options]
   basic user options: 
     -h --help   	show this message
     -v --version	show version
 
-when no options are specified program waits for input of exam answers and total points on stdin in the following format: 
+when no options are specified program waits for input of exam answers and total
+points on stdin in the following format: 
 
 <p> <q>
 a_1a_2...a_q <total points for student a>
@@ -17,19 +19,27 @@ b_1b_2...b_q <total points for student b>
 ...
 p_1p_2...p_q <total points for student p>
 
-where p is positive integer representing the number of students and q is a positive integer representing the number of exam questions For each question all students answered either 1 or 0 represented by the a_1a_2...a_q
+where p is positive integer representing the number of students and q is a positive
+integer representing the number of exam questions For each question all students
+answered either 1 or 0 represented by the a_1a_2...a_q
+
 Example:
+
 3 5
 01101 4
 10100 3
 00011 3
 
-once input is given the program will calculate all possibilies of exams that could lead to the scores. If there is only one way for the exam answers to match the given input the sequence of answers is given, else only the number of possible sequences is given.
+once input is given the program will calculate all possibilies of exams that could
+lead to the scores. If there is only one way for the exam answers to match the given
+input the sequence of answers is given, else only the number of possible sequences
+is given.
+
 program info:
 	name: InferExamAnswers
 	description: Algorithms and Datastructures practicum 2 infer exam answers algorithm
 	author: Ties Klappe & Rowan Goemans
-	version: 1.0.0
+	version: 1.0.0-6cfd5d8+
 	mail: R.Goemans@student.science.ru.nl
 	copyright: Copyright (C) 2018 Ties Klappe & Rowan Goemans
 ```
@@ -51,7 +61,7 @@ Example usage:
 > make
 ```
 
-Now the executable will be available in `build/src/BoxNesting`
+Now the executable will be available in `build/src/InferExamAnswers`
 
 ## Test
 The project uses the catch2 testing framework. The build is tested with version 2.4.2 but it should work with any version >= 2.0.0
