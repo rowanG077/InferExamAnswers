@@ -2,9 +2,9 @@
 #include "Parser.hpp"
 #include "version.hpp"
 
-#include <cstdlib>
 #include <iostream>
-#include <sstream>
+#include <string>
+#include <vector>
 
 void printVersion()
 {
@@ -74,9 +74,9 @@ int main(int argc, char** argv)
 
 	auto solutions = InferExamAnswers::Algorithm::runAlgorithm(examResults);
 
-	if (solutions.size() == 1)
+	if (solutions.getSize() == 1)
 	{
-		auto& s = solutions.front();
+		auto s = solutions.getSolution();
 		for (size_t i = 0; i < examResults.questionCount; ++i)
 		{
 			std::cout << ((s >> (examResults.questionCount - i)) & 1U);
@@ -84,7 +84,7 @@ int main(int argc, char** argv)
 	}
 	else
 	{
-		std::cout << solutions.size() << " solutions";
+		std::cout << solutions.getSize() << " solutions";
 	}
 
 	std::cout << std::endl;

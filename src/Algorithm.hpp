@@ -1,11 +1,10 @@
 #pragma once
 
 #include "ExamResults.hpp"
+#include "SolutionCollection.hpp"
 
 #include <cstdint>
-#include <list>
 #include <unordered_map>
-#include <vector>
 
 /**
  * @brief Contains code for the InferExamAnswers problem
@@ -13,31 +12,28 @@
 namespace InferExamAnswers
 {
 
-struct ValarrayHash {
+struct ScoreValarrayHash {
 	size_t operator()(const std::valarray<uint8_t>& v) const {
-		std::hash<uint8_t> hasher;
-		size_t seed = 0;
-		for (auto i : v) {
-			seed ^= hasher(i) + 0x9e3779b9 + (seed << 6u) + (seed >> 2u);
+		size_t hash = 0;
+		for (uint8_t i = 0; i < v.size(); ++i)
+		{
+			hash |= v[i] << (5U * i);
 		}
-		return seed;
+		return hash;
 	}
 };
 
-struct ValarrayEqual {
+struct ScoreValarrayEqual {
 	bool operator()(const std::valarray<uint8_t>& a, const std::valarray<uint8_t>& b) const {
-		bool equals = true;
-
 		for (size_t i = 0; i < a.size(); ++i)
 		{
-			equals &= a[i] == b[i];
-			if (!equals)
+			if (a[i] != b[i])
 			{
-				break;
+				return false;
 			}
 		}
 
-		return equals;
+		return true;
 	}
 };
 
@@ -50,7 +46,7 @@ public:
 	/**
 	 * @brief Map that contains the score of each student as a key and the value are the associated solutions
 	 */
-	using ScoreMap = std::unordered_map<std::valarray<uint8_t>, std::list<uint32_t>, ValarrayHash, ValarrayEqual>;
+	using ScoreMap = std::unordered_map<std::valarray<uint8_t>, SolutionCollection, ScoreValarrayHash, ScoreValarrayEqual>;
 
 	/**
 	 * @brief Deleted constructor
@@ -94,7 +90,7 @@ public:
 	 * @param examResults The results of the exam
 	 * @return The possible results
 	 */
-	[[nodiscard]] static std::list<uint64_t> runAlgorithm(const ExamResults& examResults);
+	[[nodiscard]] static SolutionCollection runAlgorithm(const ExamResults& examResults);
 
 	/**
 	 * @brief Compute a scoreMap for a part of the exam. The part that is computed is indicated by indices n and m
@@ -105,6 +101,5 @@ public:
 	 * @return The resulting scoreMap
 	 */
 	[[nodiscard]] static ScoreMap computeScoreMap(const ExamResults& examResults, uint8_t n, uint8_t m);
-
 };
 } // InferExamAnswers
