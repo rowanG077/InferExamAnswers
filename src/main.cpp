@@ -79,7 +79,7 @@ int main(int argc, char** argv)
 		auto s = solutions.getSolution();
 		for (size_t i = 0; i < examResults.questionCount; ++i)
 		{
-			std::cout << ((s >> (examResults.questionCount - i)) & 1U);
+			std::cout << ((s >> (examResults.questionCount - i - 1)) & 1U);
 		}
 	}
 	else

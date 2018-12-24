@@ -78,5 +78,22 @@ SCENARIO("Bitsequence generation")
 			}
 		}
 
+		WHEN("There is a very large exam with many students")
+		{
+			InferExamAnswers::ExamResults examResults {
+				{0b0000, 0b1010, 0b0101, 0b1111},
+				{20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20},
+				40,
+				12
+			};
+
+			auto result = InferExamAnswers::Algorithm::runAlgorithm(examResults);
+			
+			THEN("the algorithm finds four solutions")
+			{
+				REQUIRE(result.getSize() == 4);
+			}
+		}
+
 	}
 }
