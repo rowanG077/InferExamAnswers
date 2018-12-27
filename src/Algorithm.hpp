@@ -15,7 +15,7 @@ namespace InferExamAnswers
  * @brief We are using a val array as key in an unordered_map so we need
  *        a hash function for it. We can create a perfect hash function
  *        that is always collision free. Since we know we have a maximum
- *        of 12 students and a partition has the maximum of 40/2 = 20
+ *        of 12 students and a partition has a maximum of 40/2 = 20
  *        questions we can use 5 bits to store the score for each student.
  *        Since sizeof(size_t) is 64 we can use 60 bits to store a
  *        lossless version of the score. Which means we will never have

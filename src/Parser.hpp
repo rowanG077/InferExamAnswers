@@ -4,8 +4,6 @@
 #include "ParserError.hpp"
 
 #include <istream>
-#include <utility>
-#include <valarray>
 
 /**
  * @brief Contains code for the InferExamAnswers problem

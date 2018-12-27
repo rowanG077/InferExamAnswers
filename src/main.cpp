@@ -8,13 +8,14 @@
 
 void printVersion()
 {
-	std::cout << "program info:" << std::endl
-			  << "\tname: " << INFEREXAMANSWERS_NAME << std::endl
-			  << "\tdescription: " << INFEREXAMANSWERS_DESCRIPTION << std::endl
-			  << "\tauthor: " << INFEREXAMANSWERS_AUTHOR << std::endl
-			  << "\tversion: " << INFEREXAMANSWERS_VERSION << std::endl
-			  << "\tmail: " << INFEREXAMANSWERS_MAIL << std::endl
-			  << "\tcopyright: " << INFEREXAMANSWERS_COPYRIGHT << std::endl;
+	std::cout
+		<< "program info:" << std::endl
+		<< "\tname: " << INFEREXAMANSWERS_NAME << std::endl
+		<< "\tdescription: " << INFEREXAMANSWERS_DESCRIPTION << std::endl
+		<< "\tauthor: " << INFEREXAMANSWERS_AUTHOR << std::endl
+		<< "\tversion: " << INFEREXAMANSWERS_VERSION << std::endl
+		<< "\tmail: " << INFEREXAMANSWERS_MAIL << std::endl
+		<< "\tcopyright: " << INFEREXAMANSWERS_COPYRIGHT << std::endl;
 }
 
 void printHelp(const std::string& progName)
@@ -73,10 +74,10 @@ int main(int argc, char** argv)
 
 	const auto examResults = InferExamAnswers::Parser::getExamResults(std::cin);
 
-	auto solutions = InferExamAnswers::Algorithm::runAlgorithm(examResults);
+	const auto solutions = InferExamAnswers::Algorithm::runAlgorithm(examResults);
 
 	if (solutions.getSize() == 1) {
-		auto s = solutions.getSolution();
+		const auto s = solutions.getSolution();
 		for (size_t i = 0; i < examResults.questionCount; ++i) {
 			std::cout << ((s >> (examResults.questionCount - i - 1)) & 1U);
 		}

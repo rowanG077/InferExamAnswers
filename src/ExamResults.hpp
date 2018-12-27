@@ -27,12 +27,12 @@ struct ExamResults
 	/**
 	 * @brief The number of questions for the exam
 	 */
-	std::uint8_t questionCount;
+	uint8_t questionCount;
 
 	/**
 	 * @brief The number of students that took the exam
 	 */
-	std::uint8_t studentCount;
+	uint8_t studentCount;
 };
 
 } // InferExamAnswers

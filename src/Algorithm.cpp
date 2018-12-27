@@ -8,7 +8,7 @@ SolutionCollection Algorithm::runAlgorithm(const ExamResults& examResults)
 	 * We split the answers of all students into two parts. We brute force
 	 * The possible exam solution for each side and then combine the results
 	 */
-	uint8_t splitIndex = examResults.questionCount / 2;
+	const uint8_t splitIndex = examResults.questionCount / 2;
 
 	/**
 	 * The results of the brute force computation of each side is stored
@@ -50,21 +50,21 @@ SolutionCollection Algorithm::runAlgorithm(const ExamResults& examResults)
 	return solutions;
 }
 
-Algorithm::ScoreMap Algorithm::computeScoreMap(const ExamResults& examResults, uint8_t n, uint8_t m)
+Algorithm::ScoreMap Algorithm::computeScoreMap(const ExamResults& examResults, const uint8_t n, const uint8_t m)
 {
 	/**
 	 *  Compute the length of the answers to create for the current partition
 	 *  and the also compute the length of the anwers for the other partition.
 	 */
-	uint8_t currentSequenceLength = m - n;
-	uint8_t otherSequenceLength = examResults.questionCount - currentSequenceLength;
+	const uint8_t currentSequenceLength = m - n;
+	const uint8_t otherSequenceLength = examResults.questionCount - currentSequenceLength;
 
 	/**
 	 * We have to check 2^currentSequenceLength solutions.
 	 * So we create that number so we can use it as the upper
 	 * limit in a for loop.
 	 */
-	uint64_t solutionsToCheck = 1UL << currentSequenceLength;
+	const uint64_t solutionsToCheck = 1UL << currentSequenceLength;
 
 	/**
 	 * Since we are checking a subset of the total answers
@@ -73,7 +73,7 @@ Algorithm::ScoreMap Algorithm::computeScoreMap(const ExamResults& examResults, u
 	 * to filter out only the bits of the current subset since
 	 * it contains currentSequenceLength number of 1 bits
 	 */
-	uint64_t scoreMask = solutionsToCheck - 1UL;
+	const uint64_t scoreMask = solutionsToCheck - 1UL;
 
 	/**
 	 * Initial bucket count will be the amount of possible solutions so a rehash
@@ -118,7 +118,7 @@ Algorithm::ScoreMap Algorithm::computeScoreMap(const ExamResults& examResults, u
 			 * For this we use the special builtin function popcount which actually results
 			 * in a single assembly instruction on modern hardware.
 			 */
-			uint64_t correctAnswers = ~((examResults.answers[j] >> n) ^ i) & scoreMask;
+			const uint64_t correctAnswers = ~((examResults.answers[j] >> n) ^ i) & scoreMask;
 			score[j] = __builtin_popcount(correctAnswers);
 
 			/**

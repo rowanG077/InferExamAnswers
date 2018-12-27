@@ -30,16 +30,18 @@ ExamResults Parser::getExamResults(std::istream& inputStream)
 		throw ParserError(ss.str());
 	}
 
-	auto rawStudentCount = std::stoi(match[1].str());
-	auto rawQuestionCount = std::stoi(match[2].str());
+	const auto rawStudentCount = std::stoi(match[1].str());
+	const auto rawQuestionCount = std::stoi(match[2].str());
 	if (rawStudentCount > maxStudent) {
 		std::stringstream ss;
-		throw std::invalid_argument("A maximum of 12 students are supported.");
+		ss << "A maximum of " << maxStudent << " students are supported.";
+		throw std::invalid_argument(ss.str());
 	}
 
 	if (rawQuestionCount > maxQuestion) {
 		std::stringstream ss;
-		throw std::invalid_argument("A maximum of 40 questions are supported.");
+		ss << "A maximum of " << maxQuestion << " questions are supported.";
+		throw std::invalid_argument(ss.str());
 	}
 
 	studentCount = static_cast<uint8_t>(rawStudentCount);
@@ -50,7 +52,7 @@ ExamResults Parser::getExamResults(std::istream& inputStream)
 	std::valarray<uint64_t> studentAnswers(studentCount);
 	std::valarray<uint8_t> examScores(studentCount);
 
-	for (std::size_t i = 0; i < studentCount; ++i) {
+	for (size_t i = 0; i < studentCount; ++i) {
 		std::getline(inputStream, inputLine);
 		if (!std::regex_match(inputLine, match, questionRegex)) {
 			std::stringstream ss;
@@ -58,7 +60,7 @@ ExamResults Parser::getExamResults(std::istream& inputStream)
 			throw ParserError(ss.str());
 		}
 
-		auto rawScore = std::stoi(match[2].str());
+		const auto rawScore = std::stoi(match[2].str());
 		if (rawScore > questionCount) {
 			throw std::invalid_argument("Score is higher then the number of questions.");
 		}
