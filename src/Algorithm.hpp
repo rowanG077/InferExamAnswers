@@ -33,7 +33,7 @@ struct ScoreValarrayHash
 	{
 		size_t hash = 0;
 		for (uint8_t i = 0; i < v.size(); ++i) {
-			hash |= v[i] << (5U * i);
+			hash |= static_cast<size_t>(v[i]) << (5U * i);
 		}
 		return hash;
 	}

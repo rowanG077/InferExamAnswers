@@ -1,0 +1,38 @@
+#include <Algorithm.hpp>
+#include <catch2/catch.hpp>
+
+SCENARIO("Algorithm benchmarking 1")
+{
+	GIVEN("an algorithm that can infer exam solution given a list of exam answers and scores")
+	{
+		WHEN("There is a very large exam with many students")
+		{
+			InferExamAnswers::ExamResults examResults {
+				{
+					0b1001001110000001011110110001110001001001,
+					0b0101000110111110110011001001001010010101,
+					0b1001111001011110000100010000110000000001,
+					0b0100000001110100000000011101111011101000,
+					0b0011011010100111100100101100001001101111,
+					0b0101111011110001011011101011010111011101,
+					0b0010111000111101001000011100110111111000,
+					0b1010000011011101100101111000010010101100,
+					0b0011101111101100111001011011100000111000,
+					0b0001011011000110000010111110100101100010,
+					0b1011111111000111001110101100111010011011,
+					0b1101110101010100100011010100110000000101
+				},
+				{20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20},
+				40,
+				12
+			};
+
+			auto result = InferExamAnswers::Algorithm::runAlgorithm(examResults);
+
+			THEN("the algorithm gets a result")
+			{
+				REQUIRE(result.getSize() == 0);
+			}
+		}
+	}
+}
